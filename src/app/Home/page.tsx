@@ -6,23 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { getProyectos, eliminarProyectoAPI } from '../api';
 import NavComponte from './navbar';
+import { Image } from "@heroui/react";
+import CrearProyecto from '@/CrearProyecto/page';
 
 export default function Home() {
-  const [proyectos, setProyectos] = useState([]);
+  const [proyectos, setProyectos] = useState<any[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Función para cargar proyectos
+  const fetchProyectos = async () => {
+    try {
+      const proyectosBackend = await getProyectos();
+      setProyectos(proyectosBackend);
+    } catch (error) {
+      console.error('Error al obtener proyectos:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProyectos = async () => {
-      try {
-        const proyectosBackend = await getProyectos();
-        setProyectos(proyectosBackend);
-      } catch (error) {
-        console.error('Error al obtener proyectos:', error);
-      }
-    };
     fetchProyectos();
   }, []);
 
-  const eliminarProyecto = async (id) => {
+  const eliminarProyecto = async (id: string) => {
     const eliminado = await eliminarProyectoAPI(id);
     if (eliminado) {
       setProyectos(proyectos.filter(proyecto => proyecto._id !== id));
@@ -31,17 +36,30 @@ export default function Home() {
     }
   };
 
+  // Función que se ejecuta cuando se crea un proyecto exitosamente
+  const handleProyectoCreado = () => {
+    fetchProyectos(); // Recargar la lista de proyectos
+  };
+
   return (
     <div className="container mx-auto p-4 text-center">
       {/* NavBar */}
       <NavComponte />
 
       {/* Encabezado */}
-      <h1 className="text-4xl font-bold text-blue-600">Inicio</h1>
-      <p className="text-gray-600">Aquí puedes crear nuevos proyectos o tareas.</p>
-      <Button asChild>
-        <Link href="/crearproyecto">Crear Nuevo</Link>
-      </Button>
+      <h1 className="text-4xl font-bold text-blue-600 m-2">Inicio</h1>
+      <p className="text-gray-600 m-2">Aquí puedes crear nuevos proyectos o tareas.</p>
+
+      {/* Botón para abrir el modal */}
+      <Button onClick={() => setIsModalOpen(true)}>Crear Nuevo</Button>
+
+      {/* Modal para crear proyecto */}
+      {isModalOpen && (
+        <CrearProyecto
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={handleProyectoCreado}
+        />
+      )}
 
       {/* Lista de proyectos */}
       <h2 className="text-2xl mt-8 text-blue-600">Proyectos Creados</h2>
@@ -57,14 +75,17 @@ export default function Home() {
               <CardContent>
                 <p className="text-gray-600">{proyecto.descripcion}</p>
                 {proyecto.imagen && (
-                  <img
-                    src={proyecto.imagen.includes('uploads')
-                      ? `http://localhost:5000${proyecto.imagen}`
-                      : `/${proyecto.imagen}`
-                    }
-                    alt={proyecto.nombre}
-                    className="mt-2 rounded-md max-h-40"
-                  />
+                  <div className="flex justify-center my-5">
+                    <Image
+                      isBlurred
+                      src={proyecto.imagen.includes('uploads')
+                        ? `http://localhost:5000${proyecto.imagen}`
+                        : `/${proyecto.imagen}`
+                      }
+                      alt={proyecto.nombre}
+                      className="rounded-md max-h-40 object-cover w-full"
+                    />
+                  </div>
                 )}
                 <div className="flex justify-between mt-4">
                   <Button asChild>
