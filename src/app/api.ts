@@ -1,11 +1,11 @@
 import axios from "axios";
-
-const API_URL = "http://localhost:5000/api"; // Cambia si tu backend usa otro puerto
+const API_URL = process.env.NEXT_PUBLIC_API_URL; 
+//const API_URL = "http://localhost:5000/api"; // Cambia si tu backend usa otro puerto
 
 // Obtener proyectos
 export const getProyectos = async () => {
   try {
-    const response = await axios.get(`${API_URL}/proyectos`);
+    const response = await axios.get(`${API_URL}/api/proyectos`);
     return response.data;
   } catch (error) {
     console.error("Error al obtener proyectos:", error);
@@ -16,7 +16,7 @@ export const getProyectos = async () => {
 // Crear un nuevo proyecto
 export const crearProyecto = async (formData) => {
   try {
-    const response = await fetch("http://localhost:5000/api/proyectos", {
+    const response = await fetch(`${API_URL}/api/proyectos`, {
       method: "POST",
       body: formData, 
     });

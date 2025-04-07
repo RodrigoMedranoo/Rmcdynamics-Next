@@ -58,8 +58,8 @@ export default function NavComponte() {
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
-          <Link color="foreground" href="#">
-            Features
+          <Link aria-current="page" href="/Home">
+            Inicio
           </Link>
         </NavbarItem>
         <NavbarItem isActive>

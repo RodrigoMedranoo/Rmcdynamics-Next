@@ -101,4 +101,43 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// Obtener sprints por proyecto
+router.get("/:proyectoId", async (req, res) => {
+  try {
+    const sprints = await Sprint.find({ proyectoId: req.params.proyectoId });
+    res.json(sprints);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener los sprints" });
+  }
+});
+
+// Crear nuevos sprints para un proyecto
+router.post("/:proyectoId", async (req, res) => {
+  try {
+    const { sprints } = req.body; // array de sprints desde el frontend
+    const proyectoId = req.params.proyectoId;
+
+    const nuevosSprints = sprints.map(s => ({
+      ...s,
+      proyectoId,
+    }));
+
+    const creados = await Sprint.insertMany(nuevosSprints);
+    res.status(201).json(creados);
+  } catch (error) {
+    res.status(500).json({ error: "Error al crear los sprints" });
+  }
+});
+
+// Eliminar sprints seleccionados
+router.delete("/", async (req, res) => {
+  try {
+    const { ids } = req.body; // array de _id de los sprints
+    await Sprint.deleteMany({ _id: { $in: ids } });
+    res.json({ message: "Sprints eliminados" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al eliminar sprints" });
+  }
+});
+
 export default router;

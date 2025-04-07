@@ -5,9 +5,12 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { getProyectos, eliminarProyectoAPI } from '../api';
-import NavComponte from './navbar';
+import NavComponte from '@/components/NavBar/navbar';
 import { Image } from "@heroui/react";
 import CrearProyecto from '@/CrearProyecto/page';
+//import { useRouter } from 'next/router';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Home() {
   const [proyectos, setProyectos] = useState<any[]>([]);
@@ -22,6 +25,8 @@ export default function Home() {
       console.error('Error al obtener proyectos:', error);
     }
   };
+
+
 
   useEffect(() => {
     fetchProyectos();
@@ -41,18 +46,21 @@ export default function Home() {
     fetchProyectos(); // Recargar la lista de proyectos
   };
 
+  //const router = useRouter();
+  function handleClickChangePage(id: String): void {
+    //router.push(`/Progress/${id}`)
+  }
+
   return (
     <div className="container mx-auto p-4 text-center">
       {/* NavBar */}
       <NavComponte />
 
-      {/* Encabezado */}
-      <h1 className="text-4xl font-bold text-blue-600 m-2">Inicio</h1>
-      <p className="text-gray-600 m-2">Aquí puedes crear nuevos proyectos o tareas.</p>
-
-      {/* Botón para abrir el modal */}
-      <Button onClick={() => setIsModalOpen(true)}>Crear Nuevo</Button>
-
+      <div className="flex flex-col items-center justify-center mt-6 space-y-4">
+        <h1 className="text-4xl font-bold text-blue-600">Inicio</h1>
+        <p className="text-gray-600">Aquí puedes crear nuevos proyectos o tareas.</p>
+        <Button onClick={() => setIsModalOpen(true)}>Crear Nuevo</Button>
+      </div>
       {/* Modal para crear proyecto */}
       {isModalOpen && (
         <CrearProyecto
@@ -79,7 +87,7 @@ export default function Home() {
                     <Image
                       isBlurred
                       src={proyecto.imagen.includes('uploads')
-                        ? `http://localhost:5000${proyecto.imagen}`
+                        ? `${API_URL}${proyecto.imagen}`
                         : `/${proyecto.imagen}`
                       }
                       alt={proyecto.nombre}
@@ -88,8 +96,8 @@ export default function Home() {
                   </div>
                 )}
                 <div className="flex justify-between mt-4">
-                  <Button asChild>
-                    <Link href={`/proyecto/${proyecto._id}`}>Ver Detalles</Link>
+                  <Button /* onClick={() => handleClickChangePage(proyecto._id)} */ variant="default">
+                    <Link href={`/Progress/?id=${proyecto._id}`}>Ver Detalles</Link>
                   </Button>
                   <Button onClick={() => eliminarProyecto(proyecto._id)} variant="destructive">
                     Eliminar
