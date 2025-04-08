@@ -58,18 +58,18 @@ export default function NavComponentProgress() {
 
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
                 <NavbarItem>
-                    <Link color="foreground" href="#">
-                        Features
+                    <Link color="foreground" href="/Home">
+                        Inicio
                     </Link>
                 </NavbarItem>
                 <NavbarItem isActive>
-                    <Link aria-current="page" href="#">
-                        Customers
+                    <Link aria-current="page" href="">
+                        Progreso
                     </Link>
                 </NavbarItem>
                 <NavbarItem>
                     <Link color="foreground" href="#">
-                        Integrations
+                        Tareas Pendientes
                     </Link>
                 </NavbarItem>
             </NavbarContent>

@@ -8,16 +8,5 @@ const projectSchema = new mongoose.Schema({
   collection: 'Proyecto' // Especificamos que queremos guardar en la colección "Proyecto"
 });
 
-const sprintSchema = new mongoose.Schema({
-  nombre: String,
-  fechaInicio: String,
-  fechaFin: String,
-  tareas: [String], // o puedes definir un modelo más complejo si tienes tareas como objetos
-  completado: Boolean,
-  proyectoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' }
-}, {
-  collection: 'Sprint'
-});
+export default mongoose.model("Project", projectSchema);
 
-export const Sprint = mongoose.model("Sprint", sprintSchema);
-export const Project = mongoose.model("Project", projectSchema);

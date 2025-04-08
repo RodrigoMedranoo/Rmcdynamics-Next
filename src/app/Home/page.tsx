@@ -6,27 +6,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { getProyectos, eliminarProyectoAPI } from '../api';
 import NavComponte from '@/components/NavBar/navbar';
-import { Image } from "@heroui/react";
+import { Image, Skeleton } from "@heroui/react";
 import CrearProyecto from '@/CrearProyecto/page';
-//import { useRouter } from 'next/router';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Home() {
   const [proyectos, setProyectos] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Función para cargar proyectos
   const fetchProyectos = async () => {
     try {
+      setLoading(true);
       const proyectosBackend = await getProyectos();
       setProyectos(proyectosBackend);
     } catch (error) {
       console.error('Error al obtener proyectos:', error);
+    } finally {
+      setLoading(false);
     }
   };
-
-
 
   useEffect(() => {
     fetchProyectos();
@@ -41,19 +41,12 @@ export default function Home() {
     }
   };
 
-  // Función que se ejecuta cuando se crea un proyecto exitosamente
   const handleProyectoCreado = () => {
-    fetchProyectos(); // Recargar la lista de proyectos
+    fetchProyectos();
   };
-
-  //const router = useRouter();
-  function handleClickChangePage(id: String): void {
-    //router.push(`/Progress/${id}`)
-  }
 
   return (
     <div className="container mx-auto p-4 text-center">
-      {/* NavBar */}
       <NavComponte />
 
       <div className="flex flex-col items-center justify-center mt-6 space-y-4">
@@ -61,7 +54,7 @@ export default function Home() {
         <p className="text-gray-600">Aquí puedes crear nuevos proyectos o tareas.</p>
         <Button onClick={() => setIsModalOpen(true)}>Crear Nuevo</Button>
       </div>
-      {/* Modal para crear proyecto */}
+
       {isModalOpen && (
         <CrearProyecto
           onClose={() => setIsModalOpen(false)}
@@ -69,9 +62,30 @@ export default function Home() {
         />
       )}
 
-      {/* Lista de proyectos */}
       <h2 className="text-2xl mt-8 text-blue-600">Proyectos Creados</h2>
-      {proyectos.length === 0 ? (
+
+      {/* 👇 Mostrar skeletons si loading */}
+      {loading ? (
+        <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, idx) => (
+            <Card key={idx} className="p-4 space-y-4">
+              <Skeleton className="rounded-lg">
+                <div className="h-32 rounded-lg bg-default-300" />
+              </Skeleton>
+              <Skeleton className="w-3/4 rounded-lg">
+                <div className="h-4 bg-default-200 rounded-lg" />
+              </Skeleton>
+              <Skeleton className="w-2/3 rounded-lg">
+                <div className="h-4 bg-default-200 rounded-lg" />
+              </Skeleton>
+              <div className="flex justify-between gap-4 mt-4">
+                <Skeleton className="w-1/3 h-10 rounded-lg" />
+                <Skeleton className="w-1/3 h-10 rounded-lg" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : proyectos.length === 0 ? (
         <p className="text-gray-600">No hay proyectos creados.</p>
       ) : (
         <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
@@ -96,8 +110,8 @@ export default function Home() {
                   </div>
                 )}
                 <div className="flex justify-between mt-4">
-                  <Button /* onClick={() => handleClickChangePage(proyecto._id)} */ variant="default">
-                    <Link href={`/Progress/?id=${proyecto._id}`}>Ver Detalles</Link>
+                  <Button variant="default">
+                    <Link href={`/Progress/${proyecto._id}`}>Ver Detalles</Link>
                   </Button>
                   <Button onClick={() => eliminarProyecto(proyecto._id)} variant="destructive">
                     Eliminar

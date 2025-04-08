@@ -47,3 +47,28 @@ export const eliminarProyectoAPI = async (id) => {
   }
 };
 
+export const obtenerSprintsPorProyecto = async (proyectoId) => {
+  try {
+    const response = await fetch(`${API_URL}/api/sprints/proyecto/${proyectoId}`);
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener los sprints:", error);
+    return [];
+  }
+};
+
+// Crear sprint
+export const crearSprint = async (sprint) => {
+  try {
+    const response = await fetch(`${API_URL}/api/sprints`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sprint),
+    });
+
+    return response.ok ? await response.json() : null;
+  } catch (error) {
+    console.error("Error al crear el sprint:", error);
+    return null;
+  }
+};

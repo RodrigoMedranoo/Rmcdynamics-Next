@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import projectRoutes from "./routes/projectRoutes.js"; // Importar rutas
+import sprintRoutes from "./routes/sprintRoutes.js"
 
 dotenv.config();
 
@@ -25,6 +26,8 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Rutas
 app.use("/api/proyectos", projectRoutes); 
+
+app.use("/api/sprints", sprintRoutes)
 
 app.get("/", (req, res) => {
   res.send("API funcionando");

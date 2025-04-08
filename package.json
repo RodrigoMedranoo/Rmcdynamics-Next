@@ -11,10 +11,11 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
-    "@heroui/react": "^2.7.5",
+    "@heroui/react": "^2.7.6",
     "@heroui/system": "^2.4.12",
     "@heroui/theme": "^2.4.12",
     "@heroui/toast": "^2.0.6",
+    "@internationalized/date": "^3.7.0",
     "@nextui-org/react": "^2.6.11",
     "@radix-ui/react-slot": "^1.1.2",
     "autoprefixer": "^10.4.21",

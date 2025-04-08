@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     "firebaseconfig.js"
-  ],
+, "src/app/Progress/[id]"  ],
   "exclude": [
     "node_modules"
   ]
