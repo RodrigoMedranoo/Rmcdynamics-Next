@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import app from 'firebaseconfig';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { getProyectos, eliminarProyectoAPI } from '../api';
@@ -15,6 +18,25 @@ export default function Home() {
   const [proyectos, setProyectos] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const router = useRouter();
+  const auth = getAuth(app);
+
+  // Verifica si el usuario está logeado
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (userFirebase) => {
+      if (userFirebase) {
+        setUser(userFirebase);
+        fetchProyectos();
+      } else {
+        router.push('/Login'); // o simplemente setUser(null) si no quieres redirigir
+      }
+      setCheckingAuth(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const fetchProyectos = async () => {
     try {
@@ -27,10 +49,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchProyectos();
-  }, []);
 
   const eliminarProyecto = async (id: string) => {
     const eliminado = await eliminarProyectoAPI(id);
@@ -45,6 +63,10 @@ export default function Home() {
     fetchProyectos();
   };
 
+  if (checkingAuth) return null; // o un loader
+
+  if (!user) return null; // Si no quieres redirigir, solo ocultas todo
+
   return (
     <div className="container mx-auto p-4 text-center">
       <NavComponte />
@@ -52,7 +74,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center mt-6 space-y-4">
         <h1 className="text-4xl font-bold text-blue-600">Inicio</h1>
         <p className="text-gray-600">Aquí puedes crear nuevos proyectos o tareas.</p>
-        <Button onClick={() => setIsModalOpen(true)}>Crear Nuevo</Button>
+        <Button onClick={() => setIsModalOpen(true)}>Crear Nuevo Proyecto</Button>
       </div>
 
       {isModalOpen && (
@@ -64,7 +86,6 @@ export default function Home() {
 
       <h2 className="text-2xl mt-8 text-blue-600">Proyectos Creados</h2>
 
-      {/* 👇 Mostrar skeletons si loading */}
       {loading ? (
         <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, idx) => (

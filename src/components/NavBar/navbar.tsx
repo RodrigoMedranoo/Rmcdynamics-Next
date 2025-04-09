@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -9,9 +9,11 @@ import {
   NavbarMenuItem,
   Link,
   Button,
+  User,
 } from "@heroui/react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import app from "firebaseconfig";
 import RegisterModal from "@/Register/page";
-import { useState } from "react";
 
 export const AcmeLogo = () => {
   return (
@@ -29,9 +31,10 @@ export const AcmeLogo = () => {
 export default function NavComponte() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar el modal de registro
+  const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
+  const [checkingAuth, setCheckingAuth] = useState(true); // Estado para saber si estamos verificando la autenticación
 
   const menuItems = [
-    "Profile",
     "Dashboard",
     "Activity",
     "Analytics",
@@ -42,6 +45,22 @@ export default function NavComponte() {
     "Help & Feedback",
     "Log Out",
   ];
+
+  // Verificar el estado de autenticación del usuario
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(getAuth(app), (userFirebase) => {
+      if (userFirebase) {
+        setUser(userFirebase);
+      } else {
+        setUser(null);
+      }
+      setCheckingAuth(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (checkingAuth) return null; // Mostrar algo mientras se verifica la autenticación
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
@@ -67,24 +86,44 @@ export default function NavComponte() {
             Customers
           </Link>
         </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
-        </NavbarItem>
       </NavbarContent>
+
+      {/* Mostrar el nombre del usuario si está autenticado */}
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-          <Link href="Login">Login</Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color="primary" href="#"
-            className="text-blue-500 hover:underline"
-            onClick={() => setIsModalOpen(true)} variant="flat">
-            Sign Up
-          </Button>
-        </NavbarItem>
+        {user ? (
+          <NavbarItem>
+            {/* Hacer que el avatar actúe como enlace al perfil */}
+            <Link href={`/Profile`}>
+              <User
+                avatarProps={{
+                  src: user.photoURL || "", // Imagen de perfil o avatar predeterminado
+                }}
+                description="Usuario autenticado"
+                name={user.displayName || user.email} // Nombre del usuario o correo
+              />
+            </Link>
+          </NavbarItem>
+        ) : (
+          <>
+            <NavbarItem className="hidden lg:flex">
+              <Link href="Login">Login</Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Button
+                as={Link}
+                color="primary"
+                href="#"
+                className="text-blue-500 hover:underline"
+                onClick={() => setIsModalOpen(true)}
+                variant="flat"
+              >
+                Sign Up
+              </Button>
+            </NavbarItem>
+          </>
+        )}
       </NavbarContent>
+
       <NavbarMenu>
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
@@ -101,8 +140,8 @@ export default function NavComponte() {
           </NavbarMenuItem>
         ))}
       </NavbarMenu>
+
       <RegisterModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
     </Navbar>
   );
 }
-
