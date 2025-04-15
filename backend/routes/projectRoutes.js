@@ -1,5 +1,7 @@
 import express from "express";
 import Project from "../models/Project.js";
+import multer from "multer";
+const upload = multer({ dest: "uploads/" });
 
 
 const router = express.Router();
@@ -15,13 +17,33 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Ruta para crear un nuevo proyecto
-router.post("/", async (req, res) => {
-  const { nombre, descripcion } = req.body;
-
+router.post("/", upload.single("imagen"), async (req, res) => {
   try {
-    const nuevoProyecto = new Project({ nombre, descripcion });
+    const { nombre, descripcion } = req.body;
+    let imagen = "";
+
+    if (!nombre || !descripcion) {
+      return res.status(400).json({ message: "Faltan campos obligatorios." });
+    }
+
+    // ✅ Caso: Imagen personalizada
+    if (req.file) {
+      imagen = `/uploads/${req.file.filename}`;
+    } 
+    
+    // ✅ Caso: Imagen predeterminada enviada como string
+    else if (req.body.imagen && typeof req.body.imagen === "string" && req.body.imagen.startsWith("/predeterminadas/")) {
+      imagen = req.body.imagen;
+    } 
+    
+    // ❌ Ninguna imagen válida
+    else {
+      return res.status(400).json({ message: "La imagen es requerida." });
+    }
+
+    const nuevoProyecto = new Project({ nombre, descripcion, imagen });
     await nuevoProyecto.save();
+
     res.status(201).json(nuevoProyecto);
   } catch (error) {
     console.error("Error al crear el proyecto:", error);
