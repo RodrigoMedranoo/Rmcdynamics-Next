@@ -13,7 +13,7 @@ import {
 } from "@heroui/react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import app from "firebaseconfig";
-import RegisterModal from "@/Register/page";
+import RegisterModal from "@/components/Register/page";
 
 export const AcmeLogo = () => {
   return (

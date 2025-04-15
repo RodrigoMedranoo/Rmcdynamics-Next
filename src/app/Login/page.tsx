@@ -5,7 +5,7 @@ import { getAuth, signInWithEmailAndPassword, signInAnonymously } from "firebase
 import { Button, Input } from "@heroui/react";
 import app from "../../../firebaseconfig";
 import Link from "next/link";
-import RegisterModal from "@/Register/page";
+import RegisterModal from "@/components/Register/page";
 
 // Íconos
 const EyeSlashFilledIcon = (props: any) => (

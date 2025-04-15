@@ -6,21 +6,25 @@ import { Button } from '@/components/ui/button';
 import NavComponentProgress from '@/components/NavBar/navbarprogress';
 import axios from 'axios';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton } from '@heroui/react';
+import { useRouter } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Progress({ params }) {
+    const idProject = params.id;
+    const router = useRouter();
     const [sprints, setSprints] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [sprintsSeleccionados, setSprintsSeleccionados] = useState<string[]>([]);
     const [proyectoId, setProyectoId] = useState<string>('');
+    const [errorFechas, setErrorFechas] = useState(false);
     const [nuevoSprint, setNuevoSprint] = useState({
         nombre: '',
         fechaInicio: '',
         fechaFin: '',
     });
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const idProject = params.id;
+
 
     useEffect(() => {
         if (idProject) {
@@ -28,6 +32,23 @@ export default function Progress({ params }) {
             obtenerSprints(idProject);
         }
     }, [idProject]);
+
+    useEffect(() => {
+        if (idProject) {
+            setProyectoId(idProject);
+            obtenerSprints(idProject);
+        }
+    }, [idProject]);
+
+    useEffect(() => {
+        const { fechaInicio, fechaFin } = nuevoSprint;
+        if (fechaInicio && fechaFin && new Date(fechaInicio) > new Date(fechaFin)) {
+            setErrorFechas(true);
+        } else {
+            setErrorFechas(false);
+        }
+    }, [nuevoSprint.fechaInicio, nuevoSprint.fechaFin]);
+
 
     const obtenerSprints = async (id: string) => {
         try {
@@ -41,6 +62,8 @@ export default function Progress({ params }) {
     };
 
     const handleCreateSprint = async () => {
+        if (errorFechas) return;
+
         try {
             const newSprint = { ...nuevoSprint, proyectoId: idProject };
             const response = await axios.post(`${API_URL}/api/sprints`, newSprint);
@@ -111,6 +134,7 @@ export default function Progress({ params }) {
             </div>
 
             {/* Modal para crear Sprint */}
+            {/* Modal para crear Sprint */}
             <Modal isOpen={isOpen} onOpenChange={onClose}>
                 <ModalContent>
                     <ModalHeader className="flex flex-col gap-1">Crear Sprint</ModalHeader>
@@ -136,15 +160,22 @@ export default function Progress({ params }) {
                             type="date"
                             value={nuevoSprint.fechaFin}
                             onChange={(e) => setNuevoSprint({ ...nuevoSprint, fechaFin: e.target.value })}
-                            className="w-full px-4 py-2 mb-4 border rounded"
+                            className="w-full px-4 py-2 mb-2 border rounded"
                         />
+
+                        {errorFechas && (
+                            <p className="text-red-500 text-sm mb-2">
+                                La fecha de inicio no puede ser posterior a la fecha de fin.
+                            </p>
+                        )}
                     </ModalBody>
                     <ModalFooter>
                         <Button variant="destructive" onClick={onClose}>Cancelar</Button>
-                        <Button onClick={handleCreateSprint}>Crear Sprint</Button>
+                        <Button onClick={handleCreateSprint} disabled={errorFechas}>Crear Sprint</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+
 
             {/* Skeleton o Sprints */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -174,7 +205,7 @@ export default function Progress({ params }) {
                                 <div className="flex justify-between items-start">
                                     <h3 className="text-2xl font-bold text-gray-800">{sprint.nombre}</h3>
                                     <div className="flex flex-col items-end gap-2">
-                                        <Button variant="default">Ver Tareas</Button>
+                                        <Button variant="default" onClick={() => router.push(`/SprintDetails/${sprint._id}`)}>Ver Tareas</Button>
                                         <label className="text-sm flex items-center gap-2">
                                             <input
                                                 type="checkbox"
@@ -193,6 +224,14 @@ export default function Progress({ params }) {
                                         {sprint.completado ? 'Completado' : 'Pendiente'}
                                     </span>
                                 </div>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="font-semibold">📝 Tareas pendientes:</span>
+                                    <span>
+                                        {sprint.tareas ? sprint.tareas.filter((t: any) => !t.completada).length : 0}
+                                    </span>
+                                </div>
+
                                 <div className="flex flex-col gap-1">
                                     <div className="flex items-center gap-2">
                                         <span className="text-gray-500">📅 Fecha de Inicio:</span>
@@ -205,6 +244,7 @@ export default function Progress({ params }) {
                                 </div>
                             </CardContent>
                         </Card>
+
                     ))
                 )}
             </div>

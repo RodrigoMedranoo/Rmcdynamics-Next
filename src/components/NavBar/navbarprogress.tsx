@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     Navbar,
     NavbarBrand,
@@ -9,9 +9,11 @@ import {
     NavbarMenuItem,
     Link,
     Button,
+    User,
 } from "@heroui/react";
-import RegisterModal from "@/Register/page";
-import { useState } from "react";
+import RegisterModal from "@/components/Register/page";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import app from "firebaseconfig"; // Asegúrate de que este sea el archivo correcto de configuración
 
 export const AcmeLogo = () => {
     return (
@@ -28,7 +30,25 @@ export const AcmeLogo = () => {
 
 export default function NavComponentProgress() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar el modal de registro
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
+    const [checkingAuth, setCheckingAuth] = useState(true); // Estado para saber si estamos verificando la autenticación
+
+    // Verificar el estado de autenticación del usuario
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(getAuth(app), (userFirebase) => {
+            if (userFirebase) {
+                setUser(userFirebase);
+            } else {
+                setUser(null);
+            }
+            setCheckingAuth(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    if (checkingAuth) return null; // Mostrar algo mientras se verifica la autenticación
 
     const menuItems = [
         "Profile",
@@ -58,33 +78,51 @@ export default function NavComponentProgress() {
 
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
                 <NavbarItem>
-                    <Link color="foreground" href="/Home">
+                    <Link aria-current="page" href="/Home">
                         Inicio
                     </Link>
                 </NavbarItem>
                 <NavbarItem isActive>
-                    <Link aria-current="page" href="">
+                    <Link aria-current="page" href="#">
                         Progreso
                     </Link>
                 </NavbarItem>
-                <NavbarItem>
-                    <Link color="foreground" href="#">
-                        Tareas Pendientes
-                    </Link>
-                </NavbarItem>
             </NavbarContent>
+
             <NavbarContent justify="end">
-                <NavbarItem className="hidden lg:flex">
-                    <Link href="Login">Login</Link>
-                </NavbarItem>
-                <NavbarItem>
-                    <Button as={Link} color="primary" href="#"
-                        className="text-blue-500 hover:underline"
-                        onClick={() => setIsModalOpen(true)} variant="flat">
-                        Sign Up
-                    </Button>
-                </NavbarItem>
+                {user ? (
+                    <NavbarItem>
+                        <Link href={`/Profile`}>
+                            <User
+                                avatarProps={{
+                                    src: user.photoURL || "", // Imagen de perfil o avatar predeterminado
+                                }}
+                                description="Usuario autenticado"
+                                name={user.displayName || user.email} // Nombre del usuario o correo
+                            />
+                        </Link>
+                    </NavbarItem>
+                ) : (
+                    <>
+                        <NavbarItem className="hidden lg:flex">
+                            <Link href="Login">Login</Link>
+                        </NavbarItem>
+                        <NavbarItem>
+                            <Button
+                                as={Link}
+                                color="primary"
+                                href="#"
+                                className="text-blue-500 hover:underline"
+                                onClick={() => setIsModalOpen(true)}
+                                variant="flat"
+                            >
+                                Sign Up
+                            </Button>
+                        </NavbarItem>
+                    </>
+                )}
             </NavbarContent>
+
             <NavbarMenu>
                 {menuItems.map((item, index) => (
                     <NavbarMenuItem key={`${item}-${index}`}>
@@ -101,8 +139,8 @@ export default function NavComponentProgress() {
                     </NavbarMenuItem>
                 ))}
             </NavbarMenu>
+
             <RegisterModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
         </Navbar>
     );
 }
-

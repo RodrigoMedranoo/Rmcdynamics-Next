@@ -72,7 +72,8 @@ const Profile = () => {
             {/* Contenido principal */}
             <div className="text-center">
                 <h1 className="text-2xl font-bold mb-4">Bienvenido, {userAuth || 'Invitado'}</h1>
-                {userAuth && (
+                {/* Cambia esta condición */}
+                {(userAuth || userAuth === null) && (
                     <Button onClick={handleLogout} variant="default" className="mt-4">
                         Cerrar sesión
                     </Button>

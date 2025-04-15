@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input } from '@heroui/react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import app from '../../firebaseconfig';
+import app from '../../../firebaseconfig';
 
 const EyeSlashFilledIcon = (props) => (
     <svg
