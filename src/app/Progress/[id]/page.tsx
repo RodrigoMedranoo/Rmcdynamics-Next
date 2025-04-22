@@ -5,7 +5,10 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import NavComponentProgress from '@/components/NavBar/navbarprogress';
 import axios from 'axios';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton } from '@heroui/react';
+import {
+    Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
+    useDisclosure, Skeleton
+} from '@heroui/react';
 import { useRouter } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -25,14 +28,6 @@ export default function Progress({ params }) {
     });
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-
-    useEffect(() => {
-        if (idProject) {
-            setProyectoId(idProject);
-            obtenerSprints(idProject);
-        }
-    }, [idProject]);
-
     useEffect(() => {
         if (idProject) {
             setProyectoId(idProject);
@@ -49,7 +44,6 @@ export default function Progress({ params }) {
         }
     }, [nuevoSprint.fechaInicio, nuevoSprint.fechaFin]);
 
-
     const obtenerSprints = async (id: string) => {
         try {
             const res = await axios.get(`${API_URL}/api/sprints?proyectoId=${id}`);
@@ -63,7 +57,6 @@ export default function Progress({ params }) {
 
     const handleCreateSprint = async () => {
         if (errorFechas) return;
-
         try {
             const newSprint = { ...nuevoSprint, proyectoId: idProject };
             const response = await axios.post(`${API_URL}/api/sprints`, newSprint);
@@ -103,12 +96,12 @@ export default function Progress({ params }) {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="min-h-screen bg-background container mx-auto p-4">
             <NavComponentProgress />
 
             <div className="text-center mt-6 space-y-4">
                 <h1 className="text-4xl font-bold text-blue-600">Progreso de Sprints</h1>
-                <p className="text-gray-600">Gestiona y visualiza el estado de tus sprints.</p>
+                <p className="dark:text-gray-300">Gestiona y visualiza el estado de tus sprints.</p>
             </div>
 
             <div className="my-6 text-center">
@@ -119,7 +112,9 @@ export default function Progress({ params }) {
                         style={{ width: `${calcularProgresoTotal()}%` }}
                     ></div>
                 </div>
-                <p className="text-gray-600 text-lg">{Math.round(calcularProgresoTotal())}% Completado</p>
+                <p className="text-gray-600 dark:text-gray-300 text-lg">
+                    {Math.round(calcularProgresoTotal())}% Completado
+                </p>
             </div>
 
             <div className="flex justify-center gap-4 my-6">
@@ -133,8 +128,6 @@ export default function Progress({ params }) {
                 </Button>
             </div>
 
-            {/* Modal para crear Sprint */}
-            {/* Modal para crear Sprint */}
             <Modal isOpen={isOpen} onOpenChange={onClose}>
                 <ModalContent>
                     <ModalHeader className="flex flex-col gap-1">Crear Sprint</ModalHeader>
@@ -176,12 +169,10 @@ export default function Progress({ params }) {
                 </ModalContent>
             </Modal>
 
-
-            {/* Skeleton o Sprints */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {loading ? (
                     Array.from({ length: 3 }).map((_, index) => (
-                        <Card key={index} className="p-4 space-y-4">
+                        <Card key={index} className="p-4 space-y-4 bg-card">
                             <CardHeader>
                                 <Skeleton className="w-3/4 h-6 rounded-lg bg-default-200" />
                             </CardHeader>
@@ -197,13 +188,18 @@ export default function Progress({ params }) {
                         </Card>
                     ))
                 ) : sprints.length === 0 ? (
-                    <p className="text-center text-gray-600 col-span-full">No hay sprints disponibles para mostrar.</p>
+                    <p className="text-center text-gray-600 dark:text-gray-300 col-span-full">
+                        No hay sprints disponibles para mostrar.
+                    </p>
                 ) : (
                     sprints.map((sprint) => (
-                        <Card key={sprint._id} className="p-4 shadow-lg rounded-2xl border border-gray-200 hover:shadow-xl transition-shadow">
+                        <Card
+                            key={sprint._id}
+                            className="p-4 bg-card dark:bg-gray-800 shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+                        >
                             <CardHeader>
                                 <div className="flex justify-between items-start">
-                                    <h3 className="text-2xl font-bold text-gray-800">{sprint.nombre}</h3>
+                                    <h3 className="text-2xl font-bold ">{sprint.nombre}</h3>
                                     <div className="flex flex-col items-end gap-2">
                                         <Button variant="default" onClick={() => router.push(`/SprintDetails/${sprint._id}`)}>Ver Tareas</Button>
                                         <label className="text-sm flex items-center gap-2">
@@ -217,34 +213,34 @@ export default function Progress({ params }) {
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="mt-2 space-y-4 text-gray-700 text-sm">
+                            <CardContent className="mt-2 space-y-4 text-sm text-gray-700 dark:text-gray-200">
                                 <div className="flex items-center gap-2">
                                     <span className="font-semibold">Estado:</span>
-                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${sprint.completado ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${sprint.completado
+                                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                        }`}>
                                         {sprint.completado ? 'Completado' : 'Pendiente'}
                                     </span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
                                     <span className="font-semibold">📝 Tareas pendientes:</span>
-                                    <span>
-                                        {sprint.tareas ? sprint.tareas.filter((t: any) => !t.completada).length : 0}
-                                    </span>
+                                    <span>{sprint.tareas ? sprint.tareas.filter((t: any) => !t.completada).length : 0}</span>
                                 </div>
 
                                 <div className="flex flex-col gap-1">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-gray-500">📅 Fecha de Inicio:</span>
-                                        <span>{new Date(sprint.fechaInicio).toLocaleDateString('es-ES')}</span>
+                                        <span className="text-gray-500 dark:text-gray-400">📅 Fecha de Inicio:</span>
+                                        <span className="dark:text-gray-300">{new Date(sprint.fechaInicio).toLocaleDateString('es-ES')}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-gray-500">📅 Fecha de Fin:</span>
-                                        <span>{new Date(sprint.fechaFin).toLocaleDateString('es-ES')}</span>
+                                        <span className="text-gray-500 dark:text-gray-400">📅 Fecha de Fin:</span>
+                                        <span className="dark:text-gray-300">{new Date(sprint.fechaFin).toLocaleDateString('es-ES')}</span>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
-
                     ))
                 )}
             </div>

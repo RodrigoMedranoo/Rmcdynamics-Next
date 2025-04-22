@@ -2,13 +2,14 @@
 'use client';
 
 import { HeroUIProvider } from '@heroui/react'
-import { ToastProvider } from "@heroui/toast";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export default function Providers({ children }) {
   return (
     <HeroUIProvider>
-      <ToastProvider />
-      {children}
+      <NextThemesProvider attribute="class" defaultTheme="light" enableSystem={true}>
+        {children}
+      </NextThemesProvider>
     </HeroUIProvider>
   )
 }

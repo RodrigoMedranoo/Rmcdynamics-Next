@@ -14,6 +14,7 @@ import {
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import app from "firebaseconfig";
 import RegisterModal from "@/components/Register/page";
+import ThemeSwitcher from "../ThemeSwitcher/ThemeSwitcher";
 
 export const AcmeLogo = () => {
   return (
@@ -65,6 +66,7 @@ export default function NavComponte() {
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
+        <ThemeSwitcher />
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
