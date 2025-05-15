@@ -10,7 +10,10 @@ import sprintRoutes from "./routes/sprintRoutes.js"
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Permitir formularios
 
@@ -35,6 +38,7 @@ app.get("/", (req, res) => {
   res.send("API funcionando");
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor corriendo en http://192.168.10.58:${PORT}`);
 });
+

@@ -12,8 +12,8 @@ import {
     User,
 } from "@heroui/react";
 import RegisterModal from "@/components/Register/page";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import app from "firebaseconfig"; // Asegúrate de que este sea el archivo correcto de configuración
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import app from "firebaseconfig";
 import ThemeSwitcher from "../ThemeSwitcher/ThemeSwitcher";
 
 export const AcmeLogo = () => {
@@ -32,10 +32,45 @@ export const AcmeLogo = () => {
 export default function NavComponentProgress() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
-    const [checkingAuth, setCheckingAuth] = useState(true); // Estado para saber si estamos verificando la autenticación
+    const [user, setUser] = useState(null);
+    const [checkingAuth, setCheckingAuth] = useState(true);
+    const [currentPath, setCurrentPath] = useState("");
 
-    // Verificar el estado de autenticación del usuario
+    useEffect(() => {
+        // Obtenemos la ruta actual de manera segura
+        if (typeof window !== "undefined") {
+            setCurrentPath(window.location.pathname);
+        }
+    }, []);
+
+    const mainMenuItems = [
+        { name: "Inicio", path: "/Home", isActive: currentPath === "/Home" },
+        { name: "Progreso", path: "#", isActive: currentPath === "#" },
+    ];
+
+    const handleLogout = async () => {
+        try {
+            await signOut(getAuth(app));
+            setUser(null);
+            setIsMenuOpen(false);
+            // Redirección segura sin depender del router
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+        }
+    };
+
+    const menuItems = user
+        ? [
+            { name: "Perfil", path: "/Profile", isActive: currentPath === "/Profile" },
+            { name: "Log Out", action: handleLogout, isActive: false },
+        ]
+        : [
+            { name: "Login", path: "/Login", isActive: currentPath === "/Login" },
+            { name: "Sign Up", action: () => setIsModalOpen(true), isActive: false },
+            { name: "Help & Feedback", path: "/help", isActive: currentPath === "/help" },
+        ];
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(getAuth(app), (userFirebase) => {
             if (userFirebase) {
@@ -49,24 +84,10 @@ export default function NavComponentProgress() {
         return () => unsubscribe();
     }, []);
 
-    if (checkingAuth) return null; // Mostrar algo mientras se verifica la autenticación
-
-    const menuItems = [
-        "Profile",
-        "Dashboard",
-        "Activity",
-        "Analytics",
-        "System",
-        "Deployments",
-        "My Settings",
-        "Team Settings",
-        "Help & Feedback",
-        "Log Out",
-    ];
+    if (checkingAuth) return null;
 
     return (
         <Navbar onMenuOpenChange={setIsMenuOpen}>
-
             <ThemeSwitcher />
 
             <NavbarContent>
@@ -81,42 +102,34 @@ export default function NavComponentProgress() {
             </NavbarContent>
 
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
-                <NavbarItem>
-                    <Link aria-current="page" href="/Home">
-                        Inicio
-                    </Link>
-                </NavbarItem>
-                <NavbarItem isActive>
-                    <Link aria-current="page" href="#">
-                        Progreso
-                    </Link>
-                </NavbarItem>
+                {mainMenuItems.map((item, index) => (
+                    <NavbarItem key={index} isActive={item.isActive}>
+                        <Link href={item.path}>{item.name}</Link>
+                    </NavbarItem>
+                ))}
             </NavbarContent>
 
             <NavbarContent justify="end">
                 {user ? (
-                    <NavbarItem>
-                        <Link href={`/Profile`}>
+                    <NavbarItem className="hidden sm:flex">
+                        <Link href="/Profile">
                             <User
                                 avatarProps={{
-                                    src: user.photoURL || "", // Imagen de perfil o avatar predeterminado
+                                    src: user.photoURL || "",
                                 }}
                                 description="Usuario autenticado"
-                                name={user.displayName || user.email} // Nombre del usuario o correo
+                                name={user.displayName || user.email}
                             />
                         </Link>
                     </NavbarItem>
                 ) : (
                     <>
                         <NavbarItem className="hidden lg:flex">
-                            <Link href="Login">Login</Link>
+                            <Link href="/Login">Login</Link>
                         </NavbarItem>
                         <NavbarItem>
                             <Button
-                                as={Link}
                                 color="primary"
-                                href="#"
-                                className="text-blue-500 hover:underline"
                                 onClick={() => setIsModalOpen(true)}
                                 variant="flat"
                             >
@@ -128,18 +141,52 @@ export default function NavComponentProgress() {
             </NavbarContent>
 
             <NavbarMenu>
-                {menuItems.map((item, index) => (
-                    <NavbarMenuItem key={`${item}-${index}`}>
-                        <Link
+                {/* Menú principal */}
+                {mainMenuItems.map((item, index) => (
+                    <NavbarMenuItem key={`main-${index}`}>
+                        <Button
+                            as={Link}
                             className="w-full"
-                            color={
-                                index === 2 ? "primary" : index === menuItems.length - 1 ? "danger" : "foreground"
-                            }
-                            href="#"
+                            color={item.isActive ? "primary" : "default"}
+                            href={item.path}
                             size="lg"
+                            variant="light"
+                            onClick={() => setIsMenuOpen(false)}
                         >
-                            {item}
-                        </Link>
+                            {item.name}
+                        </Button>
+                    </NavbarMenuItem>
+                ))}
+
+                {/* Menú de usuario */}
+                {menuItems.map((item, index) => (
+                    <NavbarMenuItem key={`${item.name}-${index}`}>
+                        {item.action ? (
+                            <Button
+                                className="w-full"
+                                color={item.name === "Log Out" ? "danger" : "default"}
+                                onClick={() => {
+                                    item.action();
+                                    setIsMenuOpen(false);
+                                }}
+                                size="lg"
+                                variant="light"
+                            >
+                                {item.name}
+                            </Button>
+                        ) : (
+                            <Button
+                                as={Link}
+                                className="w-full"
+                                color={item.isActive ? "primary" : "default"}
+                                href={item.path}
+                                size="lg"
+                                variant="light"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                {item.name}
+                            </Button>
+                        )}
                     </NavbarMenuItem>
                 ))}
             </NavbarMenu>

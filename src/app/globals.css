@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,37 +28,47 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
+
   .dark {
-    --background: 0 0% 6%; /* más suave que 3.9% */
-    --foreground: 0 0% 95%; /* un poco menos blanco, menos contraste */
-    --card: 0 0% 10%; /* mejor que 3.9% para que se distinga */
+    --background: 0 0% 6%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 10%;
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 10%;
     --popover-foreground: 0 0% 95%;
     --primary: 0 0% 95%;
     --primary-foreground: 0 0% 10%;
-    --secondary: 0 0% 15%; /* suficiente contraste para botones o secciones */
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 95%;
     --muted: 0 0% 18%;
     --muted-foreground: 0 0% 65%;
     --accent: 0 0% 20%;
     --accent-foreground: 0 0% 95%;
-    --destructive: 0 70% 40%; /* rojo oscuro más visible pero no brillante */
+    --destructive: 0 70% 40%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 20%; /* más visible */
+    --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 0 0% 60%;
   }
-  
 }
 
 @layer base {
+  /* Eliminar transición en color de texto */
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+  html, body {
+    @apply bg-background transition-colors duration-500 ease-in-out;
+  }
+  /* Agregar transición solo al fondo */
+  .text-transition {
+    transition: background-color 500ms ease-in-out;
+  }
+  
+  /* Establecer color del texto inmediatamente */
+  .text-foreground {
+    transition: none; /* El texto no tiene transición para evitar el parpadeo */
   }
 }

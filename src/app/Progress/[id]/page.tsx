@@ -100,60 +100,78 @@ export default function Progress({ params }) {
             <NavComponentProgress />
 
             <div className="text-center mt-6 space-y-4">
-                <h1 className="text-4xl font-bold text-blue-600">Progreso de Sprints</h1>
-                <p className="dark:text-gray-300">Gestiona y visualiza el estado de tus sprints.</p>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Progreso de Sprints
+                </h1>
+            </div>
+            <div className="text-center mt-6 space-y-4">
+                <p className="text-muted-foreground">
+                    Gestiona y visualiza el estado de tus sprints.
+                </p>
             </div>
 
             <div className="my-6 text-center">
-                <p className="text-lg text-blue-600 mb-2">Progreso total</p>
-                <div className="w-full bg-gray-200 h-6 rounded overflow-hidden mb-1">
+                <p className="text-lg font-medium bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                    Progreso total
+                </p>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 h-6 rounded-full overflow-hidden mb-1 shadow-inner">
                     <div
-                        className="h-full bg-teal-500 transition-all"
+                        className="h-full bg-gradient-to-r from-teal-400 to-green-500 transition-all duration-500 ease-out"
                         style={{ width: `${calcularProgresoTotal()}%` }}
                     ></div>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 text-lg">
+                <p className="text-muted-foreground text-lg">
                     {Math.round(calcularProgresoTotal())}% Completado
                 </p>
             </div>
 
             <div className="flex justify-center gap-4 my-6">
-                <Button onClick={onOpen}>Agregar Sprint</Button>
+                <Button
+                    onClick={onOpen}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg hover:shadow-blue-500/30 transition-all"
+                >
+                    Agregar Sprint
+                </Button>
                 <Button
                     variant="destructive"
                     disabled={sprintsSeleccionados.length === 0}
                     onClick={eliminarSprintsSeleccionados}
+                    className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-500/90 hover:to-pink-600/90 text-white shadow hover:shadow-red-500/30 transition-all"
                 >
                     Eliminar Seleccionados
                 </Button>
             </div>
 
             <Modal isOpen={isOpen} onOpenChange={onClose}>
-                <ModalContent>
-                    <ModalHeader className="flex flex-col gap-1">Crear Sprint</ModalHeader>
+                <ModalContent className="bg-background border-border">
+                    <ModalHeader className="flex flex-col gap-1 text-foreground">
+                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent text-xl font-bold">
+                            Crear Sprint
+                        </span>
+                    </ModalHeader>
                     <ModalBody>
-                        <label className="block mb-2">Nombre del Sprint</label>
+                        <label className="block mb-2 text-foreground">Nombre del Sprint</label>
                         <input
                             type="text"
                             value={nuevoSprint.nombre}
                             onChange={(e) => setNuevoSprint({ ...nuevoSprint, nombre: e.target.value })}
-                            className="w-full px-4 py-2 mb-4 border rounded"
+                            className="w-full px-4 py-2 mb-4 border border-border rounded-lg bg-input text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
 
-                        <label className="block mb-2">Fecha de Inicio</label>
+                        <label className="block mb-2 text-foreground">Fecha de Inicio</label>
                         <input
                             type="date"
                             value={nuevoSprint.fechaInicio}
                             onChange={(e) => setNuevoSprint({ ...nuevoSprint, fechaInicio: e.target.value })}
-                            className="w-full px-4 py-2 mb-4 border rounded"
+                            className="w-full px-4 py-2 mb-4 border border-border rounded-lg bg-input text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
 
-                        <label className="block mb-2">Fecha de Fin</label>
+                        <label className="block mb-2 text-foreground">Fecha de Fin</label>
                         <input
                             type="date"
                             value={nuevoSprint.fechaFin}
                             onChange={(e) => setNuevoSprint({ ...nuevoSprint, fechaFin: e.target.value })}
-                            className="w-full px-4 py-2 mb-2 border rounded"
+                            className="w-full px-4 py-2 mb-2 border border-border rounded-lg bg-input text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
 
                         {errorFechas && (
@@ -163,8 +181,20 @@ export default function Progress({ params }) {
                         )}
                     </ModalBody>
                     <ModalFooter>
-                        <Button variant="destructive" onClick={onClose}>Cancelar</Button>
-                        <Button onClick={handleCreateSprint} disabled={errorFechas}>Crear Sprint</Button>
+                        <Button
+                            variant="destructive"
+                            onClick={onClose}
+                            className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-500/90 hover:to-pink-600/90 text-white shadow hover:shadow-red-500/30 transition-all"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleCreateSprint}
+                            disabled={errorFechas}
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg hover:shadow-blue-500/30 transition-all"
+                        >
+                            Crear Sprint
+                        </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
@@ -172,7 +202,7 @@ export default function Progress({ params }) {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {loading ? (
                     Array.from({ length: 3 }).map((_, index) => (
-                        <Card key={index} className="p-4 space-y-4 bg-card">
+                        <Card key={index} className="p-4 space-y-4 bg-card border border-border/50 hover:border-primary/30 transition-colors">
                             <CardHeader>
                                 <Skeleton className="w-3/4 h-6 rounded-lg bg-default-200" />
                             </CardHeader>
@@ -188,55 +218,64 @@ export default function Progress({ params }) {
                         </Card>
                     ))
                 ) : sprints.length === 0 ? (
-                    <p className="text-center text-gray-600 dark:text-gray-300 col-span-full">
+                    <p className="text-center text-muted-foreground col-span-full py-10">
                         No hay sprints disponibles para mostrar.
                     </p>
                 ) : (
                     sprints.map((sprint) => (
                         <Card
                             key={sprint._id}
-                            className="p-4 bg-card dark:bg-gray-800 shadow-lg rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+                            className="p-4 bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
                         >
                             <CardHeader>
                                 <div className="flex justify-between items-start">
-                                    <h3 className="text-2xl font-bold ">{sprint.nombre}</h3>
+                                    <h3 className="text-2xl font-bold text-primary group-hover:text-primary/80 transition-colors">
+                                        {sprint.nombre}
+                                    </h3>
                                     <div className="flex flex-col items-end gap-2">
-                                        <Button variant="default" onClick={() => router.push(`/SprintDetails/${sprint._id}`)}>Ver Tareas</Button>
-                                        <label className="text-sm flex items-center gap-2">
+                                        <Button
+                                            variant="default"
+                                            onClick={() => router.push(`/SprintDetails/${sprint._id}`)}
+                                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow hover:shadow-blue-500/30 transition-all"
+                                        >
+                                            Ver Tareas
+                                        </Button>
+                                        <label className="text-sm flex items-center gap-2 text-muted-foreground group-hover:text-foreground/80 transition-colors">
                                             <input
                                                 type="checkbox"
                                                 checked={sprintsSeleccionados.includes(sprint.nombre)}
                                                 onChange={() => manejarSeleccionSprint(sprint.nombre)}
+                                                className="h-4 w-4 text-primary focus:ring-primary border-border rounded"
                                             />
                                             Seleccionar
                                         </label>
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="mt-2 space-y-4 text-sm text-gray-700 dark:text-gray-200">
+                            <CardContent className="mt-2 space-y-4 text-sm">
                                 <div className="flex items-center gap-2">
-                                    <span className="font-semibold">Estado:</span>
+                                    <span className="font-semibold text-foreground">Estado:</span>
                                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${sprint.completado
-                                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                        ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white'
+                                        : 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white'
                                         }`}>
                                         {sprint.completado ? 'Completado' : 'Pendiente'}
                                     </span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <span className="font-semibold">📝 Tareas pendientes:</span>
-                                    <span>{sprint.tareas ? sprint.tareas.filter((t: any) => !t.completada).length : 0}</span>
+                                    <span className="font-semibold text-foreground">📝 Tareas pendientes:</span>
+                                    <span className="text-muted-foreground">{sprint.tareas ? sprint.tareas.filter((t: any) => !t.completada).length : 0}</span>
                                 </div>
 
                                 <div className="flex flex-col gap-1">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-gray-500 dark:text-gray-400">📅 Fecha de Inicio:</span>
-                                        <span className="dark:text-gray-300">{new Date(sprint.fechaInicio).toLocaleDateString('es-ES')}</span>
+                                        <span className="text-muted-foreground">📅 Fecha de Inicio:</span>
+                                        <span className="text-foreground">{new Date(sprint.fechaInicio).toLocaleDateString('es-ES')}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-gray-500 dark:text-gray-400">📅 Fecha de Fin:</span>
-                                        <span className="dark:text-gray-300">{new Date(sprint.fechaFin).toLocaleDateString('es-ES')}</span>
+                                        <span className="text-muted-foreground">📅 Fecha de Fin:</span>
+                                        <span className="text-foreground">{new Date(sprint.fechaFin).toLocaleDateString('es-ES')}</span>
                                     </div>
                                 </div>
                             </CardContent>

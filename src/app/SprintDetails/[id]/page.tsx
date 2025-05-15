@@ -8,6 +8,7 @@ import {
     TrashIcon,
     CheckCircleIcon
 } from '@heroicons/react/24/solid';
+import NavComponentProgress from '@/components/NavBar/navbarprogress';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -99,49 +100,81 @@ export default function SprintDetalle() {
     const todasTareasCompletas = tareas.length > 0 && tareas.every(t => t.completada);
 
     return (
-        <div className="max-w-4xl mx-auto px-6 py-10 bg-white shadow-xl rounded-lg">
-            <button
-                onClick={() => router.push(`/Progress/${sprint?.proyectoId}`)}
-                className="text-blue-500 hover:underline text-sm mb-4"
-            >
-                ← Volver a Progreso
-            </button>
+        <div className="min-h-screen bg-background text-foreground max-w-4xl mx-auto px-6 py-10">
 
-            <h2 className="text-4xl font-bold text-gray-800 mb-1">{sprint?.nombre}</h2>
-            <p className="text-gray-500 mb-6">🗂️ Gestión de tareas del sprint</p>
+            <div className="flex justify-center">
+                <NavComponentProgress />
+            </div>
+
+
+            <div className="text-center mt-6 space-y-4">
+                <button
+                    onClick={() => router.push(`/Progress/${sprint?.proyectoId}`)}
+                    className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mb-6"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Volver a Progreso
+                </button>
+            </div>
+
+
+            <div className="mb-10">
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent mb-2">
+                    {sprint?.nombre}
+                </h2>
+                <p className="text-muted-foreground flex items-center gap-2">
+                    <span className="text-xl">🗂️</span>
+                    <span>Gestión de tareas del sprint</span>
+                </p>
+            </div>
 
             {/* Formulario de tareas */}
             {!sprint?.completado && (
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-10 shadow-sm">
-                    <h3 className="text-2xl font-semibold text-gray-700 mb-6">{editando ? '✏️ Editar Tarea' : '📝 Nueva Tarea'}</h3>
+                <div className="bg-card border border-border/50 p-6 rounded-lg mb-10 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+                        {editando ? (
+                            <>
+                                <span className="text-primary">✏️</span>
+                                <span>Editar Tarea</span>
+                            </>
+                        ) : (
+                            <>
+                                <span className="text-primary">📝</span>
+                                <span>Nueva Tarea</span>
+                            </>
+                        )}
+                    </h3>
 
                     <div className="grid gap-4 md:grid-cols-2">
                         <input
-                            className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-border bg-input p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                             placeholder="Nombre de la tarea"
                             value={nombreTarea}
                             onChange={(e) => setNombreTarea(e.target.value)}
                         />
                         <input
-                            className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-border bg-input p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                             placeholder="Rol asignado"
                             value={rolTarea}
                             onChange={(e) => setRolTarea(e.target.value)}
                         />
                         <textarea
-                            className="border border-gray-300 p-3 rounded-lg md:col-span-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-border bg-input p-3 rounded-lg md:col-span-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                             placeholder="Descripción"
                             value={descripcionTarea}
                             onChange={(e) => setDescripcionTarea(e.target.value)}
+                            rows={3}
                         />
                         <input
                             type="date"
-                            className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-border bg-input p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                             value={fechaFinalizacion}
                             onChange={(e) => setFechaFinalizacion(e.target.value)}
                         />
                         <select
-                            className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-border bg-input p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                             value={estadoTarea}
                             onChange={(e) => setEstadoTarea(e.target.value)}
                         >
@@ -153,7 +186,7 @@ export default function SprintDetalle() {
 
                     <button
                         onClick={agregarTarea}
-                        className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-all"
+                        className="mt-6 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white px-6 py-3 rounded-lg transition-all shadow hover:shadow-primary/30"
                     >
                         {editando ? 'Actualizar Tarea' : 'Agregar Tarea'}
                     </button>
@@ -162,59 +195,82 @@ export default function SprintDetalle() {
 
             {/* Lista de tareas */}
             <div className="space-y-4">
-                {tareas.map((tarea, idx) => (
-                    <div
-                        key={idx}
-                        className="bg-white p-5 rounded-lg shadow-md border flex justify-between items-start transition hover:shadow-lg"
-                    >
-                        <div>
-                            <p className="text-xl font-semibold text-gray-800">{tarea.nombre}</p>
-                            <p className="text-gray-600 mt-1">📄 {tarea.descripcion}</p>
-                            <div className="flex gap-3 text-sm text-gray-500 mt-2">
-                                <span>📅 {tarea.fecha}</span>
-                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tarea.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' : tarea.estado === 'Urgente' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-800'}`}>
-                                    {tarea.estado}
-                                </span>
-                                <span>👤 {tarea.rol}</span>
-                            </div>
-                        </div>
-                        {!sprint?.completado && (
-                            <div className="flex gap-2 mt-1">
-                                <button
-                                    className="text-green-600 hover:text-green-800"
-                                    disabled={tarea.completada}
-                                    onClick={() => completarTarea(idx)}
-                                    title="Completar"
-                                >
-                                    <CheckCircleIcon className="h-6 w-6" />
-                                </button>
-                                <button
-                                    className="text-yellow-600 hover:text-yellow-800"
-                                    onClick={() => editarTarea(idx)}
-                                    title="Editar"
-                                >
-                                    <PencilSquareIcon className="h-6 w-6" />
-                                </button>
-                                <button
-                                    className="text-red-600 hover:text-red-800"
-                                    onClick={() => borrarTarea(idx)}
-                                    title="Eliminar"
-                                >
-                                    <TrashIcon className="h-6 w-6" />
-                                </button>
-                            </div>
-                        )}
+                {tareas.length === 0 ? (
+                    <div className="text-center py-12">
+                        <p className="text-muted-foreground text-lg">
+                            No hay tareas en este sprint
+                        </p>
                     </div>
-                ))}
+                ) : (
+                    tareas.map((tarea, idx) => (
+                        <div
+                            key={idx}
+                            className="bg-card border border-border/50 p-5 rounded-lg shadow-sm hover:shadow-md transition-all flex justify-between items-start group"
+                        >
+                            <div>
+                                <p className="text-xl font-semibold group-hover:text-primary/80 transition-colors">
+                                    {tarea.nombre}
+                                </p>
+                                <p className="text-muted-foreground mt-1">📄 {tarea.descripcion}</p>
+                                <div className="flex flex-wrap gap-3 text-sm mt-2">
+                                    <span className="text-muted-foreground">📅 {tarea.fecha}</span>
+                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tarea.estado === 'Pendiente'
+                                        ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white'
+                                        : tarea.estado === 'Urgente'
+                                            ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white'
+                                            : 'bg-gradient-to-r from-green-400 to-emerald-500 text-white'
+                                        }`}>
+                                        {tarea.estado}
+                                    </span>
+                                    <span className="text-muted-foreground">👤 {tarea.rol}</span>
+                                </div>
+                            </div>
+                            {!sprint?.completado && (
+                                <div className="flex gap-2 mt-1">
+                                    <button
+                                        className="text-green-500 hover:text-green-700 transition-colors"
+                                        disabled={tarea.completada}
+                                        onClick={() => completarTarea(idx)}
+                                        title="Completar"
+                                    >
+                                        <CheckCircleIcon className="h-6 w-6" />
+                                    </button>
+                                    <button
+                                        className="text-yellow-500 hover:text-yellow-700 transition-colors"
+                                        onClick={() => editarTarea(idx)}
+                                        title="Editar"
+                                    >
+                                        <PencilSquareIcon className="h-6 w-6" />
+                                    </button>
+                                    <button
+                                        className="text-red-500 hover:text-red-700 transition-colors"
+                                        onClick={() => borrarTarea(idx)}
+                                        title="Eliminar"
+                                    >
+                                        <TrashIcon className="h-6 w-6" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ))
+                )}
             </div>
 
-            <button
-                className="bg-purple-700 text-white px-6 py-3 rounded-lg mt-10 w-full disabled:opacity-50 hover:bg-purple-800 transition"
-                disabled={!todasTareasCompletas || tareas.length === 0 || sprint?.completado}
-                onClick={completarSprint}
-            >
-                ✅ Completar Sprint
-            </button>
+            {tareas.length > 0 && (
+                <button
+                    className={`mt-10 w-full py-3 rounded-lg transition-all shadow-lg ${!todasTareasCompletas || sprint?.completado
+                        ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white hover:shadow-purple-500/30'
+                        }`}
+                    disabled={!todasTareasCompletas || sprint?.completado}
+                    onClick={completarSprint}
+                >
+                    <div className="flex items-center justify-center gap-2">
+                        <CheckCircleIcon className="h-5 w-5" />
+                        <span>Completar Sprint</span>
+                    </div>
+                </button>
+            )}
         </div>
     );
 }

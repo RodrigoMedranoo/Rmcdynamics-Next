@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import {
   Navbar,
@@ -11,114 +13,115 @@ import {
   Button,
   User,
 } from "@heroui/react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import app from "firebaseconfig";
 import RegisterModal from "@/components/Register/page";
 import ThemeSwitcher from "../ThemeSwitcher/ThemeSwitcher";
+import { usePathname } from "next/navigation";
 
-export const AcmeLogo = () => {
-  return (
-    <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
-      <path
-        clipRule="evenodd"
-        d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-        fill="currentColor"
-        fillRule="evenodd"
-      />
-    </svg>
-  );
-};
+export const AcmeLogo = () => (
+  <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
+    <path
+      clipRule="evenodd"
+      d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
+      fill="currentColor"
+      fillRule="evenodd"
+    />
+  </svg>
+);
 
-export default function NavComponte() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar el modal de registro
-  const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
-  const [checkingAuth, setCheckingAuth] = useState(true); // Estado para saber si estamos verificando la autenticación
+export default function NavComponent() {
+  const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  const menuItems = [
-    "Dashboard",
-    "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
-    "My Settings",
-    "Team Settings",
-    "Help & Feedback",
-    "Log Out",
-  ];
+  const handleLogout = async () => {
+    try {
+      await signOut(getAuth(app));
+      setUser(null);
+      setIsMenuOpen(false);
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
 
-  // Verificar el estado de autenticación del usuario
+  const authMenuItems = user
+    ? [
+      {
+        name: "Perfil",
+        path: "/Profile",
+        isActive: pathname === "/Profile",
+      },
+      {
+        name: "Log Out",
+        action: handleLogout,
+      },
+    ]
+    : [
+      {
+        name: "Login",
+        path: "/Login",
+        isActive: pathname === "/Login",
+      },
+      {
+        name: "Sign Up",
+        action: () => setIsModalOpen(true),
+      },
+    ];
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(app), (userFirebase) => {
-      if (userFirebase) {
-        setUser(userFirebase);
-      } else {
-        setUser(null);
-      }
+      setUser(userFirebase || null);
       setCheckingAuth(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  if (checkingAuth) return null; // Mostrar algo mientras se verifica la autenticación
+  if (checkingAuth) return null;
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
-        <ThemeSwitcher />
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
         />
+        <ThemeSwitcher />
         <NavbarBrand>
           <AcmeLogo />
           <p className="font-bold text-inherit">RMCDynamics</p>
         </NavbarBrand>
       </NavbarContent>
 
+      {/* Escritorio */}
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
-          <Link aria-current="page" href="/Home">
-            Inicio
-          </Link>
-        </NavbarItem>
-        <NavbarItem isActive>
-          <Link aria-current="page" href="#">
-            Customers
-          </Link>
+        <NavbarItem isActive={pathname === "/Home"}>
+          <Link href="/Home">Inicio</Link>
         </NavbarItem>
       </NavbarContent>
 
-      {/* Mostrar el nombre del usuario si está autenticado */}
       <NavbarContent justify="end">
         {user ? (
-          <NavbarItem>
-            {/* Hacer que el avatar actúe como enlace al perfil */}
-            <Link href={`/Profile`}>
+          <NavbarItem className="hidden sm:flex">
+            <Link href="/Profile">
               <User
-                avatarProps={{
-                  src: user.photoURL || "", // Imagen de perfil o avatar predeterminado
-                }}
+                avatarProps={{ src: user.photoURL || "" }}
                 description="Usuario autenticado"
-                name={user.displayName || user.email} // Nombre del usuario o correo
+                name={user.displayName || user.email}
               />
             </Link>
           </NavbarItem>
         ) : (
           <>
             <NavbarItem className="hidden lg:flex">
-              <Link href="Login">Login</Link>
+              <Link href="/Login">Login</Link>
             </NavbarItem>
-            <NavbarItem>
-              <Button
-                as={Link}
-                color="primary"
-                href="#"
-                className="text-blue-500 hover:underline"
-                onClick={() => setIsModalOpen(true)}
-                variant="flat"
-              >
+            <NavbarItem className="hidden lg:flex">
+              <Button color="primary" onClick={() => setIsModalOpen(true)} variant="flat">
                 Sign Up
               </Button>
             </NavbarItem>
@@ -126,19 +129,51 @@ export default function NavComponte() {
         )}
       </NavbarContent>
 
+      {/* Menú móvil */}
       <NavbarMenu>
-        {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
-            <Link
-              className="w-full"
-              color={
-                index === 2 ? "primary" : index === menuItems.length - 1 ? "danger" : "foreground"
-              }
-              href="#"
-              size="lg"
-            >
-              {item}
-            </Link>
+        {/* SIEMPRE visible */}
+        <NavbarMenuItem>
+          <Button
+            as={Link}
+            href="/Home"
+            className="w-full"
+            size="lg"
+            variant="light"
+            color={pathname === "/Home" ? "primary" : "default"}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Inicio
+          </Button>
+        </NavbarMenuItem>
+
+        {authMenuItems.map((item, index) => (
+          <NavbarMenuItem key={index}>
+            {item.action ? (
+              <Button
+                onClick={() => {
+                  item.action();
+                  setIsMenuOpen(false);
+                }}
+                className="w-full"
+                size="lg"
+                color={item.name === "Log Out" ? "danger" : "default"}
+                variant="light"
+              >
+                {item.name}
+              </Button>
+            ) : (
+              <Button
+                as={Link}
+                href={item.path}
+                className="w-full"
+                size="lg"
+                variant="light"
+                color={item.isActive ? "primary" : "default"}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.name}
+              </Button>
+            )}
           </NavbarMenuItem>
         ))}
       </NavbarMenu>

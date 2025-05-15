@@ -6,6 +6,7 @@ import { Button, Input } from "@heroui/react";
 import app from "../../../firebaseconfig";
 import Link from "next/link";
 import RegisterModal from "@/components/Register/page";
+import ThemeSwitcher from "@/components/ThemeSwitcher/ThemeSwitcher";
 
 // Íconos
 const EyeSlashFilledIcon = (props: any) => (
@@ -76,25 +77,37 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-cover bg-center px-4" style={{ backgroundImage: "url('/background.jpg')" }}>
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">Iniciar Sesión</h1>
+    <div className="flex items-center justify-center min-h-screen bg-cover bg-center px-4 bg-background" style={{ backgroundImage: "url('/background.jpg')" }}>
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">Correo Electrónico</label>
+      <div className="absolute top-4 left-4 z-50">
+        <ThemeSwitcher />
+      </div>
+
+      <div className="bg-card border border-border/50 p-8 rounded-2xl shadow-xl w-full max-w-md backdrop-blur-sm bg-opacity-90">
+        <h1 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+          Iniciar Sesión
+        </h1>
+
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground/80">Correo Electrónico</label>
             <Input
               isRequired
               value={email}
               type="email"
               label="Correo Electrónico"
               onChange={(e) => setEmail(e.target.value)}
+              variant="bordered"
               className="w-full"
+              classNames={{
+                input: "text-foreground",
+                label: "text-foreground/70"
+              }}
             />
           </div>
 
-          <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">Contraseña</label>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground/80">Contraseña</label>
             <Input
               isRequired
               label="Contraseña"
@@ -107,38 +120,57 @@ export default function Login() {
                   className="focus:outline-none"
                   aria-label="Mostrar/Ocultar contraseña"
                 >
-                  {isVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
+                  {isVisible ?
+                    <EyeSlashFilledIcon className="text-foreground/70" /> :
+                    <EyeFilledIcon className="text-foreground/70" />
+                  }
                 </button>
               }
               type={isVisible ? "text" : "password"}
               variant="bordered"
               className="w-full"
+              classNames={{
+                input: "text-foreground",
+                label: "text-foreground/70"
+              }}
             />
           </div>
 
-          <Button type="submit" className="w-full" color="primary" variant="solid">
+          <Button
+            type="submit"
+            className="w-full py-3 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-primary/30 transition-all"
+          >
             Iniciar Sesión
           </Button>
         </form>
 
-        <div className="text-center mt-5">
-          <p className="text-sm text-gray-600">¿No tienes una cuenta?</p>
-          <Link href="#" className="text-blue-600 hover:underline text-sm" onClick={() => setIsModalOpen(true)}>
+        <div className="text-center mt-6">
+          <p className="text-sm text-muted-foreground">¿No tienes una cuenta?</p>
+          <button
+            className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+            onClick={() => setIsModalOpen(true)}
+          >
             Regístrate aquí
-          </Link>
+          </button>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 mb-2">¿Solo quieres explorar?</p>
-          <Button
-            onClick={handleAnonymousLogin}
-            variant="solid"
-            color="secondary"
-            className="w-full py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors duration-200 ease-in-out"
-          >
-            Iniciar como Invitado
-          </Button>
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border/50" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">
+              O continúa con
+            </span>
+          </div>
         </div>
+
+        <Button
+          onClick={handleAnonymousLogin}
+          className="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white shadow hover:shadow-indigo-500/30 transition-all"
+        >
+          Iniciar como Invitado
+        </Button>
       </div>
 
       <RegisterModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />

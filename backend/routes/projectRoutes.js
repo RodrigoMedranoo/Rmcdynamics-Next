@@ -28,7 +28,9 @@ router.post("/", upload.single("imagen"), async (req, res) => {
 
     // ✅ Caso: Imagen personalizada
     if (req.file) {
-      imagen = `/uploads/${req.file.filename}`;
+     const baseUrl = process.env.BASE_URL || `http://${req.headers.host}`;
+        imagen = `${baseUrl}/uploads/${req.file.filename}`;
+
     } 
     
     // ✅ Caso: Imagen predeterminada enviada como string

@@ -32,7 +32,7 @@ export const crearProyecto = async (formData) => {
 
 export const eliminarProyectoAPI = async (id) => {
   try {
-    const response = await fetch(`http://localhost:5000/api/proyectos/${id}`, {
+    const response = await fetch(`${API_URL}/api/proyectos/${id}`, {
       method: "DELETE",
     });
 

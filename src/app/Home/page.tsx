@@ -62,18 +62,24 @@ export default function Home() {
     fetchProyectos();
   };
 
-  if (checkingAuth) return null;
-  if (!user) return null;
+  if (checkingAuth || !user) return null;
 
   return (
-    <div className="min-h-screen bg-background container mx-auto p-4 text-center">
+    <main className="min-h-screen bg-background text-foreground container mx-auto p-4 transition-all duration-500 ease-in-out">
       <NavComponte />
 
-      <div className="flex flex-col items-center justify-center mt-6 space-y-4">
-        <h1 className="text-4xl font-bold text-blue-600">Inicio</h1>
-        <p className=" dark:text-gray-300">Aquí puedes crear nuevos proyectos o tareas.</p>
-        <Button onClick={() => setIsModalOpen(true)}>Crear Nuevo Proyecto</Button>
-      </div>
+      <section className="flex flex-col items-center justify-center mt-6 space-y-4">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+          Inicio
+        </h1>
+        <p className="text-muted-foreground">Aquí puedes crear nuevos proyectos o tareas.</p>
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg hover:shadow-primary/40 transition-all"
+        >
+          Crear Nuevo Proyecto
+        </Button>
+      </section>
 
       {isModalOpen && (
         <CrearProyecto
@@ -82,12 +88,16 @@ export default function Home() {
         />
       )}
 
-      <h2 className="text-2xl mt-8 text-blue-600">Proyectos Creados</h2>
+      <h2 className="text-2xl mt-10 mb-4 text-center">
+        <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-bold">
+          Proyectos Creados
+        </span>
+      </h2>
 
       {loading ? (
-        <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 mt-4 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, idx) => (
-            <Card key={idx} className="p-4 space-y-4 bg-card">
+            <Card key={idx} className="p-4 space-y-4 bg-card border border-border/50 hover:border-primary/30 transition-colors">
               <Skeleton className="rounded-lg">
                 <div className="h-32 rounded-lg bg-default-300" />
               </Skeleton>
@@ -105,34 +115,52 @@ export default function Home() {
           ))}
         </div>
       ) : proyectos.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-300">No hay proyectos creados.</p>
+        <p className="text-center text-muted-foreground mt-6">
+          No hay proyectos creados.
+        </p>
       ) : (
-        <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 mt-4 md:grid-cols-2 lg:grid-cols-3">
           {proyectos.map(proyecto => (
-            <Card key={proyecto._id} className="p-4 bg-card">
+            <Card
+              key={proyecto._id}
+              className="p-4 bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
+            >
               <CardHeader>
-                <h3 className="text-lg font-bold">{proyecto.nombre}</h3>
+                <h3 className="text-lg font-bold text-primary group-hover:text-primary/90 transition-colors">
+                  {proyecto.nombre}
+                </h3>
               </CardHeader>
-              <CardContent>
-                <p className=" dark:text-gray-300">{proyecto.descripcion}</p>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground group-hover:text-foreground/80 transition-colors">
+                  {proyecto.descripcion}
+                </p>
                 {proyecto.imagen && (
                   <div className="flex justify-center my-5">
                     <Image
                       isBlurred
-                      src={proyecto.imagen.includes('uploads')
-                        ? `http://localhost:5000${proyecto.imagen}`
-                        : `/${proyecto.imagen}`
+                      src={
+                        proyecto.imagen.startsWith('http')
+                          ? proyecto.imagen
+                          : `${API_URL}${proyecto.imagen}`
                       }
                       alt={proyecto.nombre}
-                      className="rounded-md max-h-40 object-cover w-full"
+                      className="rounded-md max-h-40 object-cover w-full group-hover:scale-[1.02] transition-transform duration-300"
                     />
+
                   </div>
                 )}
-                <div className="flex justify-between mt-4">
-                  <Button variant="default">
+                <div className="flex justify-between mt-4 gap-2">
+                  <Button
+                    variant="default"
+                    className="w-[48%] bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white shadow hover:shadow-primary/30 transition-all"
+                  >
                     <Link href={`/Progress/${proyecto._id}`}>Ver Detalles</Link>
                   </Button>
-                  <Button onClick={() => eliminarProyecto(proyecto._id)} variant="destructive">
+                  <Button
+                    onClick={() => eliminarProyecto(proyecto._id)}
+                    variant="destructive"
+                    className="w-[48%] bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-500/90 hover:to-pink-600/90 text-white shadow hover:shadow-red-500/30 transition-all"
+                  >
                     Eliminar
                   </Button>
                 </div>
@@ -141,6 +169,6 @@ export default function Home() {
           ))}
         </div>
       )}
-    </div>
+    </main>
   );
 }
