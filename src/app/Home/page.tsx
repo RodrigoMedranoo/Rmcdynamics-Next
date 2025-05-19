@@ -139,9 +139,9 @@ export default function Home() {
                     <Image
                       isBlurred
                       src={
-                        proyecto.imagen.startsWith('http')
-                          ? proyecto.imagen
-                          : `${API_URL}${proyecto.imagen}`
+                        proyecto.imagen.startsWith('/uploads')
+                          ? `${API_URL}${proyecto.imagen}` // imagen personalizada (backend)
+                          : ` ${proyecto.imagen}` // imagen predeterminada (frontend)
                       }
                       alt={proyecto.nombre}
                       className="rounded-md max-h-40 object-cover w-full group-hover:scale-[1.02] transition-transform duration-300"

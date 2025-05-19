@@ -2,11 +2,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAuth, signInWithEmailAndPassword, signInAnonymously } from "firebase/auth";
-import { Button, Input } from "@heroui/react";
+import { Button, Input, addToast } from "@heroui/react";
 import app from "../../../firebaseconfig";
 import Link from "next/link";
 import RegisterModal from "@/components/Register/page";
 import ThemeSwitcher from "@/components/ThemeSwitcher/ThemeSwitcher";
+
 
 // Íconos
 const EyeSlashFilledIcon = (props: any) => (
@@ -62,8 +63,22 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/Home");
+      addToast({
+        title: "Inicio de sesion exitoso",
+        description: "Disfrute de su visita",
+        timeout: 2000,
+        shouldShowTimeoutProgress: true,
+        color: "success"
+      });
     } catch (error) {
       console.error("Error en el inicio de sesión:", error);
+      addToast({
+        title: "Contraseña Incorrecta",
+        description: "Porfavor ingresa la contraseña correcta",
+        timeout: 2000,
+        shouldShowTimeoutProgress: true,
+        color: "danger"
+      });
     }
   };
 

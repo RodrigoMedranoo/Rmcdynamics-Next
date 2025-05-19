@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input } from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, addToast } from '@heroui/react';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import app from '../../../firebaseconfig';
 
@@ -59,18 +59,36 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onOpenChange }) =
         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         if (!allowedDomains.includes(emailDomain)) {
-            alert('Solo se permiten correos de Gmail, Outlook o Hotmail.');
+            addToast({
+                title: "Error",
+                description: "Solo se permiten correos de Gmail, Outlook o Hotmail.",
+                timeout: 2000,
+                shouldShowTimeoutProgress: true,
+                color: "danger",
+            });
             return;
         }
 
         if (!emailPattern.test(email)) {
-            alert('El correo no debe contener caracteres especiales.');
+            addToast({
+                title: "Error",
+                description: "El correo no debe contener caracteres especiales.",
+                timeout: 2000,
+                shouldShowTimeoutProgress: true,
+                color: "danger",
+            });
             return;
         }
 
         try {
             await createUserWithEmailAndPassword(auth, email, password);
-            alert('Te has registrado exitosamente.');
+            addToast({
+                title: "!Exito!",
+                description: "Te has registrado exitosamente.",
+                timeout: 1000,
+                shouldShowTimeoutProgress: true,
+                color: "success",
+            });
             onOpenChange(false);
         } catch (error) {
             alert('Error en el registro: ' + error.message);
