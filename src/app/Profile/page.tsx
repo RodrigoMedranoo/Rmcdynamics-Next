@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { getProyectos, eliminarProyectoAPI } from '@/app/api';
 import NavComponte from '@/components/NavBar/navbar';
 import Link from 'next/link';
-import { Skeleton } from "@heroui/react";
+import { Skeleton, addToast } from "@heroui/react";
 
 const Profile = () => {
     const auth = getAuth(app);
@@ -60,6 +60,13 @@ const Profile = () => {
     const handleLogout = () => {
         signOut(auth)
             .then(() => {
+                addToast({
+                    title: "Adios",
+                    description: "Sesion terminada exitosamente.",
+                    timeout: 2000,
+                    shouldShowTimeoutProgress: true,
+                    color: "success",
+                });
                 router.push('/Login');
             })
             .catch((error) => console.error('Error al cerrar sesión:', error));
